@@ -1,6 +1,6 @@
 <launch>
     <group ns="/loco/proteus/acvs">
-        <rosparam command="load" file="$(find proteus_acvs)/cfg/random_policy.yaml"/>
+        <rosparam command="load" file="$(find proteus_acvs)/param/random_policy.yaml"/>
         <node pkg="proteus_acvs" name="acvs_muxer" type="acvs_node.py" respawn="true" output="screen"></node>
     </group>
 </launch>

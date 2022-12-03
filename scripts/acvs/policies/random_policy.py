@@ -16,8 +16,14 @@ class RandomPolicy(CommunicationPolicy):
         
     # Given a message and the current context, return a selected vector for the communication.
     def select_vector(self, goal):
-        n_vectors = random.randrange(*self.vector_range)
-        return random.sample(self.vectors, n_vectors)
+        if goal.dynamic: 
+            n_vectors = random.randrange(*self.vector_range)
+            dyn_vectors = [vec for vec in self.vectors if vec.has_dynamic]
+            return random.sample(dyn_vectors, n_vectors)
+        else:
+            n_vectors = random.randrange(*self.vector_range)
+            static_vectors = [vec for vec in self.vectors if vec.has_static]
+            return random.sample(static_vectors, n_vectors)
 
     # If necessary, update the policy's rules
     def update_policy(self, min_vectors=1, max_vectors=None):

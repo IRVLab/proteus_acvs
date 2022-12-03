@@ -28,7 +28,10 @@ class ACVSNode(object):
         for key,val in vector_params.items():
             v = Vector('out')
             v.parse_from_rosparam(key, val)
-            vectors.append(v)
+
+            # Filter out implicit vectors, because we don't have the structure to deal with them rn.
+            if v.explicitness == "explicit":
+                vectors.append(v)
 
         symbol_params = rospy.get_param('/loco/proteus/symbols/out')
         symbols = []
@@ -57,8 +60,19 @@ class ACVSNode(object):
         # static_symbols {symbol: {vector: ServiceProxy } }
         # dynamic_vectors { vector: publicationFunction }
 
+        vector_endpoints = {}
+        base_ns = rospy.get_namespace().replace('acvs/', '')
+        for vector in vectors:
+            vector_endpoints[vector.id] = {'static': {}, 'dynamic': None}
+            if vector.has_dynamic:
+                vector_endpoints[vector.id]['dynamic'] = (rospy.get_namespace() + vector.namespace_prefix + '/dynamic_input', None)
+            if vector.has_static:
+                for symbol in symbols:  
+                    vector_endpoints[vector.id]['static'][symbol.id] = (base_ns + vector.namespace_prefix + '/' + symbol.name.replace(' ', '_'), symbol)
+
+
         # Next, let's build our communication dispatcher
-        self.dispatcher = CommunicationDispatcher(self.policy.select_vector)
+        self.dispatcher = CommunicationDispatcher(vector_endpoints, self.policy.select_vector)
 
 if __name__ == "__main__":
     acvs = ACVSNode()
