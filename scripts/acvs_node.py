@@ -31,38 +31,34 @@ class ACVSNode(object):
             vectors.append(v)
 
         symbol_params = rospy.get_param('/loco/proteus/symbols/out')
-        symbols = []    
+        symbols = []
         for key,val in symbol_params.items():
             s = Symbol('out')
             s.parse_from_rosparam(key, val)
             symbols.append(s)
 
-        print(vectors)
-        print(symbols)
+        policy_type = rospy.get_param("/loco/proteus/acvs/policy/type", "static")
 
-        # Pull in configuration parameters for ACVS via rosparam
-        min_v = None
-        max_v = None
-        self.policy = RandomPolicy((vectors, symbols), min_v, max_v)
+        if policy_type == "static":
+            vector = rospy.get_param("/loco/proteus/acvs/policy/selected", "digital_display")
+            self.policy = StaticPolicy((symbols, vectors), vector)
+
+        elif policy_type == "random":
+            # Pull in configuration parameters for ACVS via rosparam
+            min_v = rospy.get_param("/loco/proteus/acvs/policy/min_vectors", 1)
+            max_v = rospy.get_param("/loco/proteus/acvs/policy/max_vectors", 3)
+            self.policy = RandomPolicy((symbols, vectors), min_v, max_v)
+
+        else:
+            rospy.logerr(f"Policy type [{policy_type}] unrecognized")
+            raise NotImplemented(f"Policy type [{policy_type}] unrecognized")
 
         # Next, build up a data structure with service proxies.
         # static_symbols {symbol: {vector: ServiceProxy } }
         # dynamic_vectors { vector: publicationFunction }
 
         # Next, let's build our communication dispatcher
-        self.dispatcher = CommunicationDispatcher(self.execute(self))
-
-
-
-
-    def execute(self, goal):
-        # This gets called from the Communication dispatcher. 
-        # Why didn't I just make ACVSNode a child of SimpleActionServer....who knows
-
-        print("I'm in the ACVS Node")
-        print(type(self))
-
-
+        self.dispatcher = CommunicationDispatcher(self.policy.select_vector)
 
 if __name__ == "__main__":
     acvs = ACVSNode()

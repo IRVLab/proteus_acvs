@@ -1,0 +1,3 @@
+policy:
+  type: "static"
+  vector: "digital_display"
