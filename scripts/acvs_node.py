@@ -3,8 +3,8 @@
 import rospy
 import actionlib
 
-from proteus.symbols import Symbol
-from proteus.vectors import Vector
+from proteus.symbol import Symbol
+from proteus.vector import Vector
 
 from proteus_msgs.msg import DiverGroup, Diver
 from proteus_msgs.srv import SymbolDirectional, SymbolQuantity, SymbolTrigger
