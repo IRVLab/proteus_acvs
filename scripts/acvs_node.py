@@ -3,12 +3,13 @@
 import rospy
 import actionlib
 
-from proteus.symbol import Symbol
-from proteus.vector import Vector
+from proteus.symbols import Symbol
+from proteus.vectors import Vector
 
 from proteus_msgs.msg import DiverGroup, Diver
 from proteus_msgs.srv import SymbolDirectional, SymbolQuantity, SymbolTrigger
 
+from acvs.context.context_manager import ContextManager
 from acvs.communication_dispatcher import CommunicationDispatcher
 from acvs.policies.communication_policy import CommunicationPolicy
 from acvs.policies.static_policy import StaticPolicy
@@ -20,7 +21,7 @@ class ACVSNode(object):
         rospy.init_node("acvs_muxer", anonymous=False)
 
         # Set up a context manager with topic subscriptions to the appropriate topics.
-        #self.context = ContextManager()
+        self.context = ContextManager()
 
         # Pull in rosparams and build langauge info out of them.
         vector_params = rospy.get_param('/loco/proteus/vectors/out')

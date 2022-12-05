@@ -1,10 +1,10 @@
 from acvs.context import Context
 
-class TaskContext(Context):
+class MissionContext(Context):
     
-    def __init__(self, task_id):
+    def __init__(self, mission_id):
         super().__init__(self)
-        self.task_id = task_id
+        self.mission_id = mission_id
 
     def get_current_belief(self):
         raise NotImplementedError("Not implemented in base class, try an instantiation")
