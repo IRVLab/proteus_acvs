@@ -1,4 +1,4 @@
-from acvs.context import DiverContext, EnvironmentContext, TaskContext, MissionContext
+# from acvs.context import DiverContext, EnvironmentContext, TaskContext, MissionContext
 
 class ContextManager(object):
     storage_fp = '~/.proteus/context/'

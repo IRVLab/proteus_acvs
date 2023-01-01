@@ -8,7 +8,6 @@ from proteus_msgs.msg import CommunicateToDiverAction, CommunicateToDiverFeedbac
 
 from proteus.utils import assign_service_type
 
-
 class CommunicationDispatcher(object):
     _feedback = CommunicateToDiverFeedback()
     _result = CommunicateToDiverResult()
