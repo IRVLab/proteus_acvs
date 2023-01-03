@@ -1,5 +1,6 @@
 import rospy, actionlib
 
+from threading import Thread
 from rospy import ServiceProxy
 
 from std_msgs.msg import String
@@ -23,6 +24,7 @@ class CommunicationDispatcher(object):
         selections = self.select_vector(goal)
         
         rospy.loginfo(f"Got {len(selections)} selected vectors by policy.")
+        proxies = []
         for vec in selections:
             rospy.loginfo(f"Using {vec}")
             if goal.dynamic:
@@ -39,11 +41,18 @@ class CommunicationDispatcher(object):
                 proxy = ServiceProxy(grn, service_type)
 
                 if service_type == SymbolTrigger:
-                    proxy()
+                    t = Thread(target=proxy)
+                    proxies.append(t)
+                    t.start()
                 elif service_type == SymbolQuantity:
-                    proxy(goal.content)
+                    t = Thread(target=proxy, args=[float(goal.content)])
+                    proxies.append
+                    t.start()
                 else:
                     raise NotImplementedError(f"Service calls of type {service_type} have not yet been implemented in the Communication Dispatcher class")
+
+        for t in proxies:
+            t.join()
 
         self._result.vectors_used = [vec.id for vec in selections]
         self._as.set_succeeded(self._result)
