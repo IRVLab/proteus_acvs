@@ -19,7 +19,7 @@ class CommunicationDispatcher(object):
         self._as.start()
 
     def execute(self, goal):
-        rospy.loginfo(f"Selecting vectors for content: \"{goal.content}\"")
+        rospy.loginfo(f"Selecting vectors for content: \"{goal.symbol}\"")
         selections = self.select_vector(goal)
         
         rospy.loginfo(f"Got {len(selections)} selected vectors by policy.")
@@ -33,15 +33,15 @@ class CommunicationDispatcher(object):
                 pub.publish(msg)
 
             else:
-                grn, symbol = self.vector_endpoints[vec.id]['static'][goal.content]
+                grn, symbol = self.vector_endpoints[vec.id]['static'][goal.symbol]
 
-
-                service_type = assign_service_type( symbol.input_required)
+                service_type = assign_service_type(symbol.input_required)
                 proxy = ServiceProxy(grn, service_type)
 
                 if service_type == SymbolTrigger:
-                    pass
-                    # proxy()
+                    proxy()
+                elif service_type == SymbolQuantity:
+                    proxy(goal.content)
                 else:
                     raise NotImplementedError(f"Service calls of type {service_type} have not yet been implemented in the Communication Dispatcher class")
 
