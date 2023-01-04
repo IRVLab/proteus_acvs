@@ -1,13 +1,21 @@
-from acvs.context import Context
+from acvs.context.context import Context
+from math import sqrt
+
+def dist(a, b):
+    return sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
 class DiverContext(Context):
-    visibility_timeout = 2.0
-    def __init__(self, diver_id, time_seen, rel_pos):
-        super().__init__(self)
-        self.diver_id = diver_id
+    def __init__(self, time_seen, conf, cp, pd):
+        super().__init__()
         self.currently_seen = True
         self.last_seen = time_seen
-        self.relative_position = rel_pos
+        self.confidence = conf
+        self.center_point = cp
+        self.pseudodistance = pd
+        self.pseudoangle = dist([0.0,0.0], cp)
+
+    def get_pseudopose(self):
+        return [self.pseudodistance, self.pseudoangle]
 
     def get_current_belief(self):
         return (self.currently_seen, self.last_seen, self.relative_position)
@@ -15,9 +23,12 @@ class DiverContext(Context):
     def get_last_observation(self):
         return (self.currently_seen, self.last_seen, self.relative_position)
 
-    def report_observation(self, seen, time_seen, rel_pos):
+    def report_observation(self, seen, time_seen, conf,cp, pd):
         self.currently_seen = seen
         self.last_seen = time_seen
-        self.relative_position = rel_pos
+        self.confidence = conf
+        self.center_point = cp
+        self.pseudodistance = pd
+        self.pseudoangle = dist([0.0,0.0], cp)
 
         

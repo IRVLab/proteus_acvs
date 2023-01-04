@@ -3,7 +3,7 @@ from acvs.context import Context
 class EnvironmentContext(Context):
     
     def __init__(self, env_id , type, vis, amb, rest):
-        super().__init__(self)
+        super().__init__()
         self.environment_id = env_id
         self.type = type 
         self.visibilty = vis

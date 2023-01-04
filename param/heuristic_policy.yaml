@@ -1,0 +1,3 @@
+policy:
+  type: "heuristic"
+  rules_file: "heuristics/trial_1-5.yaml"
