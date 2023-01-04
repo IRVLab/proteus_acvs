@@ -5,14 +5,15 @@ def dist(a, b):
     return sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
 class DiverContext(Context):
-    def __init__(self, time_seen, conf, cp, pd):
+    def __init__(self, id, time_seen, conf, cp, pd):
         super().__init__()
+        self.id = id
         self.currently_seen = True
         self.last_seen = time_seen
         self.confidence = conf
         self.center_point = cp
         self.pseudodistance = pd
-        self.pseudoangle = dist([0.0,0.0], cp)
+        self.pseudoangle = dist([0.5,0.5], cp)
 
     def get_pseudopose(self):
         return [self.pseudodistance, self.pseudoangle]
@@ -29,6 +30,6 @@ class DiverContext(Context):
         self.confidence = conf
         self.center_point = cp
         self.pseudodistance = pd
-        self.pseudoangle = dist([0.0,0.0], cp)
+        self.pseudoangle = dist([0.5,0.5], cp)
 
         

@@ -19,7 +19,8 @@ class ContextManager(object):
     def update_context(self):
         # First, check the diver list and cull any who have timed out.
         ids = []
-        for key, diver in self.divers.items():
+        for key in self.divers.copy():
+            diver = self.divers[key]
             if (not diver.currently_seen) and ((rospy.Time.now() - diver.last_seen).to_sec() > ContextManager._diver_timeout):
                 self.divers.pop(key)
             else:
@@ -101,7 +102,7 @@ class ContextManager(object):
             if id in self.divers.keys():
                 self.divers[id].report_observation(visible, last_seen, conf, center_point, pseudodistance)
             elif visible:
-                self.divers[id] = DiverContext(last_seen, conf, center_point, pseudodistance)
+                self.divers[id] = DiverContext(id, last_seen, conf, center_point, pseudodistance)
         
     
     def report_environment(self, source, msg):

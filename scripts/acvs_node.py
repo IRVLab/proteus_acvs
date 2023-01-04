@@ -100,11 +100,13 @@ class ACVSNode(object):
         else:
             raise TypeError(f"What kind of policy is this: {type(self.policy)}")
 
-        rospy.loginfo(f"Got {len(selections)} selected vectors by {self.policy_type} policy.")
-        rospy.loginfo(f"Selected vectors: {selections}")
+        
+        selected_ids = [vec.id for vec in selections]
+        rospy.loginfo(f"Got {len(selected_ids)} selected vectors by {self.policy_type} policy.")
+        rospy.loginfo(f"Selected vectors: {selected_ids}")
         # self.dispatcher.dispatch_communication(goal, selections)
 
-        self._result.vectors_used = [vec.id for vec in selections]
+        self._result.vectors_used = selected_ids
         self._as.set_succeeded(self._result)
 
 if __name__ == "__main__":
