@@ -1,4 +1,4 @@
 policy:
   type: "random"
   min_vectors: 1
-  max_vectors: 3
+  max_vectors: 1

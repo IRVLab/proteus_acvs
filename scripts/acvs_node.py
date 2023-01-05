@@ -104,7 +104,7 @@ class ACVSNode(object):
         selected_ids = [vec.id for vec in selections]
         rospy.loginfo(f"Got {len(selected_ids)} selected vectors by {self.policy_type} policy.")
         rospy.loginfo(f"Selected vectors: {selected_ids}")
-        self.dispatcher.dispatch_communication(goal, selections)
+        # self.dispatcher.dispatch_communication(goal, selections)
 
         self._result.vectors_used = selected_ids
         self._as.set_succeeded(self._result)
