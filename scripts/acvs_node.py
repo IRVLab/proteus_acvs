@@ -94,9 +94,10 @@ class ACVSNode(object):
         selections = []
         if type(self.policy) in [StaticPolicy, RandomPolicy]:
             selections = self.policy.select_vector(goal)
+            criteria = 'random'
         elif type(self.policy) in [HeuristicPolicy, POMDPPolicy]:
             rel_dc = self.context.select_interactant()
-            selections = self.policy.select_vector(goal, rel_dc)
+            selections, criteria = self.policy.select_vector(goal, rel_dc)
         else:
             raise TypeError(f"What kind of policy is this: {type(self.policy)}")
 
@@ -107,6 +108,8 @@ class ACVSNode(object):
         # self.dispatcher.dispatch_communication(goal, selections)
 
         self._result.vectors_used = selected_ids
+        self._result.selection_criteria = criteria
+        
         self._as.set_succeeded(self._result)
 
 if __name__ == "__main__":

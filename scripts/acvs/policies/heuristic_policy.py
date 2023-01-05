@@ -83,16 +83,13 @@ class HeuristicPolicy(CommunicationPolicy):
             priority_weights = self.classify_priority(prio)
             content_weights = self.classify_content(content_tags)
 
-            print(distance_weights)
-            print(angle_weights)
-            print(priority_weights)
-            print(content_weights)
-
             selection_weights = {}
             for id in self.vectors.keys():
                 selection_weights[id] = distance_weights[id] * angle_weights[id] * priority_weights[id] * content_weights[id]
 
             rospy.loginfo(f"Using {selection_weights}")
+
+            criteria = {'distance':distance_weights, 'angle':angle_weights, 'priority':priority_weights, 'content':content_weights, 'selection_weights':selection_weights}
 
             rospy.loginfo("Weights calculated, selecting now")
             selected_vectors = []
@@ -126,15 +123,16 @@ class HeuristicPolicy(CommunicationPolicy):
                     # Now we do a random selection based on these likelihoods. We sort the combo weights to let the higher chance vectors
                     # Get their chance to fill the spots first.
                     for k, chance in sorted(combo_chances.items(), key=operator.itemgetter(1),reverse=True):
-                        print(f"Checking {k}")
                         if random.random() < chance and len(selected_vectors) < self.combination_config['max_vectors']:
                             selected_vectors.append(self.vectors[k])
 
-            return selected_vectors
+                    criteria['combination_weights']=combo_chances
+
+            return [selected_vectors, str(criteria)]
 
         else:
             rospy.loginfo(f"We have no known interactant, so we're going with our configured default.")
-            return [self.vectors[self.selection_config['default']]]
+            return [[self.vectors[self.selection_config['default']]], 'default']
 
 
     # If necessary, update the policy's rules
