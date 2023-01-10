@@ -1,0 +1,71 @@
+---
+heuristic_config: 
+  selection_config: 
+    criteria: "max" # ties are broken by random selection. 
+    default: "siren_tone" # If through some weighting issue no vector is selected, we use this vector.
+  context_config:
+    distance: {intimate: [0.0, 0.3], personal: [0.3, 1.5], social: [1.5, 3.0], public: [3.0, 4.0], edge: [4.0, 10.0]}
+    angle: {central: [0.0, 0.15], paracentral: [0.15, 0.5], peripheral: [0.5, 0.75], far_peripheral: [0.75, 1.0]}
+    priority: { low: [0, 3], mid: [3, 5], high: [5,7], peril: [7,10]}
+    content: ['control', 'information', 'directional', 'interjection']
+    rules:
+      # Context rules are used to determine which vector should be used in a given context. 
+      # The values range from 0.0 to 10.0 
+      # If the value is below 0.0, the vector cannot be used. 
+      # Between 0.0 and 1.0, the vector is unlikely to work out, but can be used. 
+      # At 1.0, the context rule should not effect the vector weight. 
+      # Above 1.0, the context rule will improve the likelihood of the vector being used, with the magnitude being multiplicative.
+      distance:
+        intimate: {digital_display: 2.0, siren_tts: 3.0, siren_tone: 0.5, hreye_active: 1.0, rcvm: 0.1}
+        personal: {digital_display: 0.5, siren_tts: 2.0, siren_tone: 1.5, hreye_active: 1.5, rcvm: 0.75}
+        social: {digital_display: 0.1, siren_tts: 0.5, siren_tone: 2.0, hreye_active: 2.0, rcvm: 2.0}
+        public : {digital_display: 0.0, siren_tts: 0.25, siren_tone: 2.0, hreye_active: 2.0, rcvm: 2.0}
+        edge: {digital_display: 0.0, siren_tts: 0.0, siren_tone: 1.5, hreye_active: 1.0, rcvm: 2.0}
+
+      angle:
+        central: {digital_display: 1.0, siren_tts: 1.0, siren_tone: 1.0, hreye_active: 1.0, rcvm: 1.0}
+        paracentral: {digital_display: 0.25, siren_tts: 1.0, siren_tone: 1.0, hreye_active: 1.5, rcvm: 1.0}
+        peripheral: {digital_display: 0.0, siren_tts: 1.5, siren_tone: 1.5, hreye_active: 0.5, rcvm: 2.5}
+        far_peripheral: {digital_display: 0.0, siren_tts: 2.0, siren_tone: 2.0, hreye_active: 0.25, rcvm: 5.0}
+
+      priority:
+        low: {digital_display: 1.0, siren_tts: 1.0, siren_tone: 1.0, hreye_active: 1.0, rcvm: 1.0}
+        mid: {digital_display: 0.5, siren_tts: 1.5, siren_tone: 1.5, hreye_active: 1.5, rcvm: 1.5}
+        high: {digital_display: 0.25, siren_tts: 2.0, siren_tone: 3.0, hreye_active: 2.5, rcvm: 2.0}
+        peril: {digital_display: 0.0, siren_tts: 2.0, siren_tone: 3.0, hreye_active: 3.0, rcvm: 1.5}
+
+      content:
+        control: {digital_display: 1.0, siren_tts: 3.0, siren_tone: 3.0, hreye_active: 3.0, rcvm: 1.5}
+        information: {digital_display: 2.0, siren_tts: 2.0, siren_tone: 1.5, hreye_active: 3.0, rcvm: 0.75}
+        directional: {digital_display: 1.0, siren_tts: 1.0, siren_tone: 0.75, hreye_active: 3.0, rcvm: 2.5}
+        interjection: {digital_display: 1.5, siren_tts: 1.5, siren_tone: 3.0, hreye_active: 2.0, rcvm: 2.0}
+        dynamic: {digital_display: 1.0, siren_tts: 1.0, siren_tone: 0.0, hreye_active: 0.0, rcvm: 0.0}
+
+  # This config sets up whether or not combination is allowed, max vectors, and the expected values for 
+  combination_config:
+    enabled: True
+    max_prob: 0.75 # This is the base chance of selecting a combo vector. Every time a combination is selected, we use the rules of all selected vectors multiplicitavely.
+    max_vectors: 2
+    rules:
+      # In between min and max weights, we use combination rules. 
+      # Combination rules are used to determine if a vector can be used in combination with another. 
+      # A positive value indicates likely benefit, with amount increasing by magnitude. Anything bigger than 10.0 is clipped.
+      # A value of 0 indicates ambivalence. The combination should only be used if the selection weight is high.
+      # A negative value indicates likely detriment, with amount increasing by magnitude. Anything smaller than -10.0 is clipped.
+
+      # TTS might help, tones are less likely, RCVM and HREye are likely to be useless (and possible dangerous)
+      digital_display: {siren_tts: 0.25, siren_tone: 0.1, hreye_active: -0.25, rcvm: -1.0} 
+
+      # Display might help, hreye is less likely, Tone can't be used, and RCVM would likely drown it out.
+      siren_tts: {digital_display: 0.25, siren_tone: -1.0, hreye_active: 0.15, rcvm: -0.5} 
+
+      # Display could help, TTS can't be used, lights could be helpful, and so could rcvm.
+      siren_tone: {digital_display: 0.25, siren_tts: -1.0, hreye_active: 0.25, rcvm: 0.5}
+
+      # Display isn't going to help, tts/tone could help, rcvm is likely to hurt.
+      hreye_active: {digital_display: -0.1, siren_tts: 0.15, siren_tone: 0.15, rcvm: -1.0}
+
+      # Display isn't going to help, TTS will be drowned out, Tone might help, and hreye might help too.
+      rcvm: {digital_display: -0.5, siren_tts: -0.5, siren_tone: 0.3, hreye_active: 0.3}
+
+      
